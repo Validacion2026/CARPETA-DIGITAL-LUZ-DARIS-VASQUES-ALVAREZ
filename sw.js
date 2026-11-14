@@ -1,4 +1,4 @@
-const CACHE_NAME = 'carpeta-virtual-v1'; // <-- Recuerda subir la versión
+const CACHE_NAME = 'carpeta-virtual-v5';
 
 const ARCHIVOS_OFFLINE = [
   './',
@@ -16,7 +16,6 @@ const ARCHIVOS_OFFLINE = [
   './ddr.pdf'
 ];
 
-// Al instalar, toma el control de inmediato
 self.addEventListener('install', event => {
   self.skipWaiting();
   event.waitUntil(
@@ -30,7 +29,6 @@ self.addEventListener('install', event => {
   );
 });
 
-// Al activar, borra cualquier memoria vieja
 self.addEventListener('activate', event => {
   event.waitUntil(
     caches.keys().then(keys => {
@@ -43,9 +41,8 @@ self.addEventListener('activate', event => {
   );
 });
 
-// NETWORK FIRST
+// NETWORK FIRST con ignoreSearch para evitar errores con ?v=1
 self.addEventListener('fetch', event => {
-  // Solo procesar peticiones GET dentro de tu propio origen (ignora Google Apps Script y extensiones)
   if (event.request.method !== 'GET' || !event.request.url.startsWith(self.location.origin)) {
     return;
   }
@@ -61,6 +58,6 @@ self.addEventListener('fetch', event => {
         }
         return response;
       })
-      .catch(() => caches.match(event.request))
+      .catch(() => caches.match(event.request, { ignoreSearch: true }))
   );
 });
